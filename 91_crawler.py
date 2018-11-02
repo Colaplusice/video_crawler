@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
-
+from disk_cache import DiskCache
+from mongo_cache import MongoCache
 # from tqdm import tqdm
 import os
 import time
@@ -10,12 +11,13 @@ dir_path = os.path.dirname(__file__)
 
 
 class NoCrawler:
-    def __init__(self):
+    def __init__(self, cache=None):
         self.max_page = 0
         self.base_url = 'http://92.91p26.space/v.php?next=watch'
         self.page_url = 'http://92.91p26.space/v.php?next=watch&page={}'
         self.headers = self._load_headers()
         self.video_headers = self._load_headers('headers/video_headers')
+        self.cache = cache
 
     # 得到页数
     def get_page_number(self):
@@ -39,13 +41,12 @@ class NoCrawler:
             os.mkdir(html_path)
         for i in range(1, self.max_page):
             # 判断是否有缓存
-            file_path = os.path.join(dir_path, 'html/{}.html'.format(i))
-            if os.path.exists(file_path):
+            if self.cache['{}.html'.format(i)]:
                 print('从缓存中加载{}html'.format(i))
             else:
                 url = self.page_url.format(i)
                 html = requests.get(url, headers=self.headers).text
-                open(file_path, 'w', encoding='utf-8').write(html)
+                self.cache['{}.html'.format(i)] = html
                 print('第{}页抓取完成! url为{}'.format(i, url))
                 print('将{}html写入缓存'.format(i))
                 time.sleep(3)
@@ -85,11 +86,12 @@ class NoCrawler:
                     csv_writer.writerow(keys)
 
     def get_and_save_video_url(self):
-        video_url = 'http://91.91p26.space/view_video.php?viewkey=f3ba33dc25f2434683d1&page=1&viewtype=detailed&category=mr'
-        response = requests.get(video_url, headers=self.headers)
-        html = response.text
-        with open('video/video_html', 'w', encoding='utf-8') as opener:
-            opener.write(html)
+        if self.cache:
+            pass
+        # for each_html in html_mesage:
+        #     html_page = open(os.path.join('html', each_html), 'r').read()
+        #     print(html_page)
+        #     break
 
     def main(self):
         self.get_page_number()
@@ -124,5 +126,8 @@ class NoCrawler:
 
 #
 if __name__ == '__main__':
-    crawler = NoCrawler()
+    crawler = NoCrawler(cache=MongoCache(disk_cache=DiskCache()))
     crawler.main()
+    # crawler.get_and_save_video_url()
+
+    # crawler.get_and_save_video_url()
