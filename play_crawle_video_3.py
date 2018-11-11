@@ -2,8 +2,9 @@ import requests
 import os
 from utils import _get_headers
 
+
 def download_video():
-    url = 'http://192.240.120.34//mp43/277794.mp4'
+    # url = 'http://192.240.120.34//mp43/277794.mp4'
     # url = 'http://185.38.13.130//mp43/284712.mp4?st=6dwhzemeT58Crf8E_x7WmA&e=1538895505'
     print('begin')
     headers = _get_headers('headers/video_headers')
@@ -38,7 +39,7 @@ def download_video():
             else:
                 print(response.status_code)
                 raise Exception
-        except :
+        except:
             continue
 
 
