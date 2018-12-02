@@ -2,7 +2,7 @@ import time
 import pendulum
 
 
-def _get_headers(header_file='headers'):
+def _get_headers(header_file='headers/headers'):
     headers = {}
     with open(header_file)as opener:
         header_line = opener.readlines()
@@ -64,6 +64,6 @@ class http_404_exception(Exception):
 
 
 if __name__ == '__main__':
-    time_str = '1 小时前'
+    _get_headers()
+    # time_str = '1 小时前'
 
-    absolute_time(time_str)

@@ -1,8 +1,9 @@
-from pymongo import mongo_client
-from urllib.parse import quote_plus
-import configs
-import pprint
 import json
+from urllib.parse import quote_plus
+
+from pymongo import mongo_client
+
+import configs
 
 
 class MongoCache:

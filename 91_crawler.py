@@ -3,7 +3,8 @@ from bs4 import BeautifulSoup
 import csv
 from disk_cache import DiskCache
 from mongo_cache import MongoCache
-# from tqdm import tqdm
+from tqdm import tqdm
+import random
 import sys
 import os
 import time
@@ -65,6 +66,7 @@ class NoCrawler:
         return len(list(res))
 
     def get_html(self, url):
+        time.sleep(random.random())
         html = requests.get(url, headers=self.headers).text
         self.text(url)
         self.cache[url2path(url)] = html
@@ -162,7 +164,6 @@ class NoCrawler:
     def save_videos(self):
         all_mp4_url = self.cache.values(collection='mp4_url')
         print(self.cache.length(collection='mp4_url'))
-
         with futures.ThreadPoolExecutor(3) as executor:
             executor.map(self.save_video_temp, all_mp4_url)
 
@@ -198,22 +199,22 @@ class NoCrawler:
             print('not found')
             raise http_404_exception
         with open('{}.mp4'.format(url2path(url)), 'ab')as f:
-            for chuck in res.iter_content(chunk_size=1024):
+            for chuck in tqdm(res.iter_content(chunk_size=1024)):
                 f.write(chuck)
         print('写入成功: {}'.format(url))
         return url
 
     def main(self):
         # 得到页数
-        # self.get_page_number()
+        self.get_page_number()
         # 将每页都保存下来
-        # self.get_htmls()
+        self.get_htmls()
         # 得到每页视频的url和信息
-        # self.get_video_urls(update=True)
+        self.get_video_urls(update=True)
         # 得到 mp4的真实url
-        # self.get_mp4s()
+        self.get_mp4s()
         # 保存Mp4
-        self.save_videos()
+        # self.save_videos()
 
     def login(self):
 
